@@ -22,16 +22,39 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const server_1 = __importDefault(require("./utils/server"));
-const dotenv = __importStar(require("dotenv"));
-const node_process_1 = require("node:process");
-dotenv.config({ path: 'config.env' });
-const port = Number(node_process_1.env.PORT);
-const DB_URL = node_process_1.env.DB_URL && node_process_1.env.DB_PASS ? node_process_1.env.DB_URL.replace('<PASSWORD>', node_process_1.env.DB_PASS) : '';
-const server = new server_1.default(port, DB_URL);
-server.start();
-//# sourceMappingURL=server.js.map
+const jwt = __importStar(require("jsonwebtoken"));
+class Token {
+    constructor(user, res, statusCode) {
+        this.user = user;
+        this.res = res;
+        this.statusCode = statusCode;
+    }
+    signToken(user) {
+        return jwt.sign({ id: user._id }, process.env.JWT_SECRET || '', {
+            expiresIn: process.env.JWT_EXPIRES
+        });
+    }
+    createToken() {
+        const token = this.signToken(this.user._id);
+        const cookieOptions = {
+            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: 'none',
+            secure: true,
+            domain: 'http://localhost:3000/',
+            path: '/',
+        };
+        this.res.cookie('token', token, cookieOptions);
+        this.res.status(200).json({
+            status: 'ok',
+            message: 'Token sent',
+            token,
+            data: {
+                visitor: this.user
+            }
+        });
+    }
+}
+exports.default = Token;
+//# sourceMappingURL=Token.js.map
