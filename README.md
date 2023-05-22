@@ -1,4 +1,4 @@
 # A clock In management
 
 ## overview 
-![Alt text](/clockIn.pdf)
+![Alt text](/plan.png)
