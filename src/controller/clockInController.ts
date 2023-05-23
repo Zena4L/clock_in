@@ -3,7 +3,8 @@ import { ClockIn , IClock} from "../model/clockInModel";
 import asynAwait from "../utils/asynAwait";
 import Token from "../utils/Token";
 import jwt from 'jsonwebtoken';
-import { model } from 'mongoose';
+import moment from 'moment';
+// import { Aggregate } from 'mongoose';
 
 
 
@@ -12,6 +13,7 @@ interface ReqBody {
     name:string;
     phone:string;
     purpose:string;
+    status:string
 }
 
 interface decodedToken {
@@ -26,11 +28,12 @@ interface userResponse extends Response {
     visitor?: IClock;
 }
 export const clockin = asynAwait(async(req,res,next) =>{
-    const {name, phone, purpose} = req.body as ReqBody;
+    const {name, phone, purpose, status} = req.body as ReqBody;
     const visitor = await ClockIn.create({
         name,
         phone,
-        purpose
+        purpose,
+        status
     })
 
     const token = new Token(visitor,res,200);
@@ -67,18 +70,38 @@ export const clockOut:RequestHandler = (req, res) => {
     res.status(200).json({ status: 'success' });
 };
    
-export const getDoc:RequestHandler = asynAwait(async (req,res,next)=>{
-    const {collectionName} = req.params;
-    const clockInModel =  model(collectionName);
 
-    // const result = await ClockIn.find();
-    console.log(clockInModel)
-    // res.status(200).json({
-    //     status:'ok',
-    //     data:{
-    //         result
-    //     }
-    // })
-    res.send('hello');
 
-})
+export const queryByDate: RequestHandler = asynAwait(async (req, res, next) => {
+    const { date, sortBy } = req.body;
+  
+    const startOfDay = moment(date).startOf('day').toDate();
+    const endOfDay = moment(date).endOf('day').toDate();
+  
+    const query: any = {
+      clockInTime: { $gte: startOfDay, $lte: endOfDay },
+    };
+  
+    if (sortBy && ['Student', 'Staff', 'Visitor'].includes(sortBy)) {
+      query['status'] = sortBy; 
+    }
+  
+    const clockIns = await ClockIn.find(query).exec();
+  
+    res.status(200).json({
+      status: 'ok',
+      data: {
+        clockIns,
+      },
+    });
+  });
+  
+
+  
+  
+  
+
+
+
+
+  

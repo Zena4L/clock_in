@@ -21,7 +21,17 @@ const clockSchema = new mongoose_1.Schema({
     },
     clockOutTime: {
         type: Date
+    },
+    status: {
+        type: String,
+        enum: ['Student', 'Staff', 'Visitor'],
+        required: [true, 'U must enter status']
     }
+});
+clockSchema.pre(/^find/, function (next) {
+    this.select('-__v');
+    // this.select('-_id')
+    next();
 });
 exports.ClockIn = (0, mongoose_1.model)('ClockIn', clockSchema);
 //# sourceMappingURL=clockInModel.js.map

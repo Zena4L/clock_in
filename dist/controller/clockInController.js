@@ -3,18 +3,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDoc = exports.clockOut = exports.protect = exports.clockin = void 0;
+exports.queryByDate = exports.clockOut = exports.protect = exports.clockin = void 0;
 const clockInModel_1 = require("../model/clockInModel");
 const asynAwait_1 = __importDefault(require("../utils/asynAwait"));
 const Token_1 = __importDefault(require("../utils/Token"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const mongoose_1 = require("mongoose");
+const moment_1 = __importDefault(require("moment"));
 exports.clockin = (0, asynAwait_1.default)(async (req, res, next) => {
-    const { name, phone, purpose } = req.body;
+    const { name, phone, purpose, status } = req.body;
     const visitor = await clockInModel_1.ClockIn.create({
         name,
         phone,
-        purpose
+        purpose,
+        status
     });
     const token = new Token_1.default(visitor, res, 200);
     token.createToken();
@@ -48,17 +49,22 @@ const clockOut = (req, res) => {
     res.status(200).json({ status: 'success' });
 };
 exports.clockOut = clockOut;
-exports.getDoc = (0, asynAwait_1.default)(async (req, res, next) => {
-    const { collectionName } = req.params;
-    const clockInModel = (0, mongoose_1.model)(collectionName);
-    // const result = await ClockIn.find();
-    console.log(clockInModel);
-    // res.status(200).json({
-    //     status:'ok',
-    //     data:{
-    //         result
-    //     }
-    // })
-    res.send('hello');
+exports.queryByDate = (0, asynAwait_1.default)(async (req, res, next) => {
+    const { date, sortBy } = req.body;
+    const startOfDay = (0, moment_1.default)(date).startOf('day').toDate();
+    const endOfDay = (0, moment_1.default)(date).endOf('day').toDate();
+    const query = {
+        clockInTime: { $gte: startOfDay, $lte: endOfDay },
+    };
+    if (sortBy && ['Student', 'Staff', 'Visitor'].includes(sortBy)) {
+        query['status'] = sortBy;
+    }
+    const clockIns = await clockInModel_1.ClockIn.find(query).exec();
+    res.status(200).json({
+        status: 'ok',
+        data: {
+            clockIns,
+        },
+    });
 });
 //# sourceMappingURL=clockInController.js.map

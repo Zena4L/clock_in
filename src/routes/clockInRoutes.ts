@@ -1,10 +1,11 @@
 import { Router } from "express";
-import {clockin, protect,clockOut, getDoc} from '../controller/clockInController';
+import {clockin, protect,clockOut,queryByDate} from '../controller/clockInController';
 
 const router = Router();
 
 router.post('/clockin',clockin);
 router.get('/clockout',protect,clockOut)
-router.get('/results/:collectionName',getDoc)
+router.post('/bydate',queryByDate);
+// router.post('/getstats',getStatistics);
 
 export default router;
