@@ -26,9 +26,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
 const express_1 = __importStar(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const clockInRoutes_1 = __importDefault(require("./routes/clockInRoutes"));
+// import viewRouter from './routes/viewRoutes'
 const AppError_1 = __importDefault(require("./utils/AppError"));
 const errorController_1 = __importDefault(require("./controller/errorController"));
 const app = (0, express_1.default)();
@@ -36,7 +38,10 @@ if (process.env.NODE_ENV === 'development') {
     app.use((0, morgan_1.default)('dev'));
 }
 app.use((0, express_1.json)());
-app.use('/', clockInRoutes_1.default);
+app.set('view engine', 'pug');
+app.set('views', path_1.default.join(__dirname, '..', 'src', 'views'));
+app.use('/api', clockInRoutes_1.default);
+// app.use('/',viewRouter)
 app.all('*', (req, res, next) => {
     next(new AppError_1.default(`cannot find ${req.originalUrl}`, 404));
 });

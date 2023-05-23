@@ -90,15 +90,73 @@ export const queryByDate: RequestHandler = asynAwait(async (req, res, next) => {
   
     res.status(200).json({
       status: 'ok',
+      length: clockIns.length,
       data: {
         clockIns,
       },
     });
   });
   
+//  export const getDocumentsByTimePeriod:RequestHandler = asynAwait(async(req,res,next)=>{
+//     const { startDate, endDate } = req.body;
+  
+//     const result = await ClockIn.aggregate([
+//       {
+//         $match: {
+//           clockInTime: {
+//             $gte: new Date(startDate),
+//             $lte: new Date(endDate),
+//           },
+//         },
+//       },
+//     ]);
 
+//     res.status(200).json({
+//       status: 'ok',
+//       message:"total clockings",
+//       clockins: result.length,
+//     });
+//  })
+export const getDocumentsByTimePeriod: RequestHandler = asynAwait(async (req, res, next) => {
+    const { startDate, endDate } = req.body;
+  
+    const total =  await ClockIn.find();
+
+    const result = await ClockIn.aggregate([
+      {
+        $match: {
+          clockInTime: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+  
+    const aggregatedData = result.map((item) => ({
+      status: item._id,
+      count: item.count,
+    }));
+  
+    res.status(200).json({
+      status: "ok",
+      message: "Total clockings and aggregate by status",
+      totalClockIn: total.length,
+      data: aggregatedData,
+    });
+  });
   
   
+  
+  
+  
+
   
 
 

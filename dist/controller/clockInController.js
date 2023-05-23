@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.queryByDate = exports.clockOut = exports.protect = exports.clockin = void 0;
+exports.getDocumentsByTimePeriod = exports.queryByDate = exports.clockOut = exports.protect = exports.clockin = void 0;
 const clockInModel_1 = require("../model/clockInModel");
 const asynAwait_1 = __importDefault(require("../utils/asynAwait"));
 const Token_1 = __importDefault(require("../utils/Token"));
@@ -62,9 +62,58 @@ exports.queryByDate = (0, asynAwait_1.default)(async (req, res, next) => {
     const clockIns = await clockInModel_1.ClockIn.find(query).exec();
     res.status(200).json({
         status: 'ok',
+        length: clockIns.length,
         data: {
             clockIns,
         },
+    });
+});
+//  export const getDocumentsByTimePeriod:RequestHandler = asynAwait(async(req,res,next)=>{
+//     const { startDate, endDate } = req.body;
+//     const result = await ClockIn.aggregate([
+//       {
+//         $match: {
+//           clockInTime: {
+//             $gte: new Date(startDate),
+//             $lte: new Date(endDate),
+//           },
+//         },
+//       },
+//     ]);
+//     res.status(200).json({
+//       status: 'ok',
+//       message:"total clockings",
+//       clockins: result.length,
+//     });
+//  })
+exports.getDocumentsByTimePeriod = (0, asynAwait_1.default)(async (req, res, next) => {
+    const { startDate, endDate } = req.body;
+    const total = await clockInModel_1.ClockIn.find();
+    const result = await clockInModel_1.ClockIn.aggregate([
+        {
+            $match: {
+                clockInTime: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate),
+                },
+            },
+        },
+        {
+            $group: {
+                _id: "$status",
+                count: { $sum: 1 },
+            },
+        },
+    ]);
+    const aggregatedData = result.map((item) => ({
+        status: item._id,
+        count: item.count,
+    }));
+    res.status(200).json({
+        status: "ok",
+        message: "Total clockings and aggregate by status",
+        totalClockIn: total.length,
+        data: aggregatedData,
     });
 });
 //# sourceMappingURL=clockInController.js.map
