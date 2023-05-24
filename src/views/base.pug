@@ -1,0 +1,14 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv='Content-Security-Policy', content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;")
+        script(src='https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js', defer='')
+        link(rel='stylesheet', href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css')
+        link(rel="stylesheet", href="./styles/style.css")
+        title ClockIN || #{title}
+    body(data-alert=`${alert ? alert : ''}`) 
+        block content
+        script(type="module" src="/fe/index.js" defer)

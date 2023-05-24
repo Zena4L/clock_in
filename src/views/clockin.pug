@@ -1,0 +1,25 @@
+extends base
+
+block content
+    .min-h-screen.bg-gray-100.flex.flex-col.justify-center(class='sm:py-12')
+        .p-10.mx-auto(class='xs:p-0 md:w-full md:max-w-md')
+            h1.font-bold.text-center.text-2xl.mb-5 Welcome, ClockIN with your Details
+            .bg-white.shadow.w-full.rounded-lg.divide-y.divide-gray-200
+                form.clockin.px-5.py-7
+                    label.font-semibold.text-sm.text-gray-600.pb-1.block * Full Name
+                    input#name.border.rounded-lg.px-3.py-2.mt-1.mb-5.text-sm.w-full(type='text')
+                    label.font-semibold.text-sm.text-gray-600.pb-1.block * Phone Number
+                    input#phone.border.rounded-lg.px-3.py-2.mt-1.mb-5.text-sm.w-full(type='text')
+                    label.font-semibold.text-sm.text-gray-600.pb-1.block * Purpose
+                    input#purpose.border.rounded-lg.px-3.py-2.mt-1.mb-5.text-sm.w-full(type='text')
+                    span.pb-1 * select status
+                    select#status.p-2.mb-4.text-center.border.border-gray-200.text-gray-500.w-full.rounded-lg.text-sm.shadow-sm.font-normal.text-center.inline-block(name='status', placeholder="status")
+                        option(value='Staff') Staff
+                        option(value='Student') Student
+                        option(value='Visitor') Visitor
+                    p.text-red-300.pb-1 All * fields are required
+                    button.transition.duration-200.bg-blue-500.text-white.w-full.rounded-lg.text-sm.shadow-sm.font-semibold.text-center.inline-block(type='sumbit', class='hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 py-2.5 hover:shadow-md')
+                        span.inline-block.mr-2 Clock In
+                        svg.w-4.h-4.inline-block(xmlns='http://www.w3.org/2000/svg', fill='none', viewBox='0 0 24 24', stroke='currentColor')
+                            path(stroke-linecap='round', stroke-linejoin='round', stroke-width='2', d='M17 8l4 4m0 0l-4 4m4-4H3')
+                    
