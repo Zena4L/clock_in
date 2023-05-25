@@ -1,9 +1,9 @@
 import path from 'path';
-import express, {json,urlencoded}  from 'express';
+import express, {json,urlencoded,NextFunction}  from 'express';
 import morgan from 'morgan';
 import clockRouter from './routes/clockInRoutes';
 import viewRouter from './routes/viewRouter';
-import OpError from './utils/AppError';
+import AppError from './utils/AppError';
 import globalError from './controller/errorController';
 import cors from 'cors';
 
@@ -33,8 +33,8 @@ app.use(
 app.use('/api',clockRouter);
 app.use('/',viewRouter)
 
-app.all('*',(req,res,next)=>{
-    next(new OpError(`cannot find ${req.originalUrl}`,404));
+app.all('*',(req,res,next:NextFunction)=>{
+    next(new AppError(`cannot find ${req.originalUrl}`,404));
 })
 
 app.use(globalError);

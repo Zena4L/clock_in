@@ -18,6 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.21.5",
+    "@turf/turf": "^6.5.0",
     "@types/express": "^4.17.17",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",

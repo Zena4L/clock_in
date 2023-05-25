@@ -1,13 +1,11 @@
-import {RequestHandler, Request, Response, CookieOptions} from 'express';
+import {RequestHandler, Request, Response, CookieOptions, NextFunction} from 'express';
 import { ClockIn , IClock} from "../model/clockInModel";
 import asynAwait from "../utils/asynAwait";
 import Token from "../utils/Token";
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-// import { Aggregate } from 'mongoose';
-
-
-
+import {polygon,point,booleanPointInPolygon} from '@turf/turf';
+import AppError from '../utils/AppError';
 
 interface ReqBody {
     name:string;
@@ -56,7 +54,9 @@ export const protect:RequestHandler = asynAwait(async (req:userRequest , res:use
     }
     await currentVisitor?.save();
     next();
+   
 })
+
 export const clockOut:RequestHandler = (req, res) => {
     const cookieOptions:CookieOptions = {
       maxAge: 24 * 60 * 60 * 1000,
@@ -97,26 +97,7 @@ export const queryByDate: RequestHandler = asynAwait(async (req, res, next) => {
     });
   });
   
-//  export const getDocumentsByTimePeriod:RequestHandler = asynAwait(async(req,res,next)=>{
-//     const { startDate, endDate } = req.body;
-  
-//     const result = await ClockIn.aggregate([
-//       {
-//         $match: {
-//           clockInTime: {
-//             $gte: new Date(startDate),
-//             $lte: new Date(endDate),
-//           },
-//         },
-//       },
-//     ]);
 
-//     res.status(200).json({
-//       status: 'ok',
-//       message:"total clockings",
-//       clockins: result.length,
-//     });
-//  })
 export const getDocumentsByTimePeriod: RequestHandler = asynAwait(async (req, res, next) => {
     const { startDate, endDate } = req.body;
   
@@ -153,12 +134,30 @@ export const getDocumentsByTimePeriod: RequestHandler = asynAwait(async (req, re
   });
   
   
-  
-  
-  
 
+export const geofence: RequestHandler = (req, res, next: NextFunction) => {
+    const geofence = polygon([
+      [
+        [5.299265785198542, -2.0019658782824266],
+        [5.299365621152669, -2.001828372676333],
+        [5.299108900095178, -2.001639302467955],
+        [5.299013818194961, -2.0017787178741324],
+        [5.299265785198542, -2.0019658782824266]
+      ]
+    ]);
   
+    const latlng = req.query as unknown as { lat: string; lng: string };
+    const { lat, lng } = latlng;
+  
+    const pointToCheck = point([parseFloat(lat), parseFloat(lng)]);
+    const isInside = booleanPointInPolygon(pointToCheck, geofence);
 
+    if(!isInside){
+      return next(new AppError('You are out of range',400))
+
+    }
+    next(); 
+  };
 
 
 

@@ -4,16 +4,15 @@
  *                  status will be based on the status code. 
  */
 
-class OpError extends Error{
-    public readonly statusCode : number;
-    public readonly isOperational: boolean;
-    public readonly status: string;
-    constructor(message:string,statusCode:number){
+class AppError extends Error {
+    public status:string;
+    readonly isOperational:boolean;
+    constructor(public message:string , public statusCode:number){
         super(message);
         this.statusCode = statusCode;
-        this.status = `${statusCode}`.startsWith('4') ? 'fail': 'error';
+        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
         this.isOperational = true;
-        Error.captureStackTrace(this,this.constructor());
+        Error.captureStackTrace(this, this.constructor);
     }
 }
-export default OpError;
+export default AppError;
