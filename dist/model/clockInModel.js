@@ -17,7 +17,7 @@ const clockSchema = new mongoose_1.Schema({
     },
     clockInTime: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
     clockOutTime: {
         type: Date
@@ -33,5 +33,16 @@ clockSchema.pre(/^find/, function (next) {
     // this.select('-_id')
     next();
 });
+// clockSchema.query.formatClockInTime = function () {
+//   return this.populate({
+//     path: 'clockInTime',
+//     select: '-_id',
+//     options: { lean: true },
+//     transform: (doc: { clockInTime: Date }) => {
+//       doc.clockInTime = moment(doc.clockInTime).format('YY-MM-DD:HH-mm');
+//       return doc;
+//     },
+//   });
+// };
 exports.ClockIn = (0, mongoose_1.model)('ClockIn', clockSchema);
 //# sourceMappingURL=clockInModel.js.map

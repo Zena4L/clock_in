@@ -1,4 +1,5 @@
 import { Schema, Document, model, Query } from "mongoose";
+import moment from "moment";
 
 export interface IClock extends Document {
     name: string;
@@ -24,7 +25,7 @@ const clockSchema = new Schema<IClock>({
   },
   clockInTime: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   clockOutTime: {
     type: Date
@@ -40,5 +41,17 @@ clockSchema.pre<Query<IClock,IClock>>(/^find/, function (next) {
   // this.select('-_id')
   next();
 });
+// clockSchema.query.formatClockInTime = function () {
+//   return this.populate({
+//     path: 'clockInTime',
+//     select: '-_id',
+//     options: { lean: true },
+//     transform: (doc: { clockInTime: Date }) => {
+//       doc.clockInTime = moment(doc.clockInTime).format('YY-MM-DD:HH-mm');
+//       return doc;
+//     },
+//   });
+// };
+
 
 export const ClockIn = model<IClock>('ClockIn', clockSchema);
